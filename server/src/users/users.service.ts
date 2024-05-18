@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { User, Prisma } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +13,7 @@ export class UsersService {
     if (emailExists) {
       throw new BadRequestException('Email address is already in use');
     }
-
+    data['password'] = await bcrypt.hash(data.password, 10);
     return this.prisma.user.create({
       data,
     });
