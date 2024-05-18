@@ -52,14 +52,4 @@ export class InvoiceController {
   remove(@Param('id') id: string) {
     return this.invoiceService.remove(id);
   }
-
-  @Get('/export/pdf')
-  exportPdf() {
-    return this.invoiceService.exportPdf()
-  }
-
-  @Get('/export/Excel')
-  exportExcel() {
-    return this.invoiceService.exportExcel()
-  }
 }

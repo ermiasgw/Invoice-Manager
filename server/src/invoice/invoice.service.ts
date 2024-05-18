@@ -93,12 +93,4 @@ export class InvoiceService {
       
     }
   }
-
-  exportPdf() {
-
-  }
-
-  exportExcel(){
-
-  }
 }
