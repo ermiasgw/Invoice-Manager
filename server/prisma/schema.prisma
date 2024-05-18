@@ -24,9 +24,9 @@ model User {
 
 model Invoice {
   id String @id @default(uuid())
-  user     User       @relation(fields: [userId], references: [id])
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId   Int 
-  total     Decimal
+  total     Float
   currency  String
   offerings Offering[]
   dueDate DateTime
@@ -36,9 +36,9 @@ model Offering {
   id        Int      @id @default(autoincrement())
   name      String
   description String?
-  price     Decimal
+  price     Float
   type    OfferType   @default(Product)
-  invoice     Invoice   @relation(fields: [invoiceId], references: [id])
+  invoice     Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   invoiceId   String
 }
 

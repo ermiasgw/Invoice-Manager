@@ -8,7 +8,8 @@ CREATE TYPE "Role" AS ENUM ('User', 'Admin');
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
-    "name" TEXT,
+    "name" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'User',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -18,7 +19,7 @@ CREATE TABLE "User" (
 CREATE TABLE "Invoice" (
     "id" TEXT NOT NULL,
     "userId" INTEGER NOT NULL,
-    "total" DECIMAL(65,30) NOT NULL,
+    "total" DOUBLE PRECISION NOT NULL,
     "currency" TEXT NOT NULL,
     "dueDate" TIMESTAMP(3) NOT NULL,
 
@@ -30,7 +31,7 @@ CREATE TABLE "Offering" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "price" DECIMAL(65,30) NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
     "type" "OfferType" NOT NULL DEFAULT 'Product',
     "invoiceId" TEXT NOT NULL,
 
