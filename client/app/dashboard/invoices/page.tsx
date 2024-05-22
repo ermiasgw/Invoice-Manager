@@ -80,6 +80,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import useSWR from 'swr' 
+import { deleteInvoice } from "@/app/actions/invoice"
 
 
 export default function InvoiceList() {
@@ -178,34 +179,48 @@ export default function InvoiceList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data && data.map((value: any, index: any) => {
+                  {data && data.map((value: any, index: any) => (
+                    
                     <TableRow key={index} className="bg-accent">
-                    <TableCell>
-                      {value.id}
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">Liam Johnson</div>
-                      <div className="hidden text-sm text-muted-foreground md:inline">
-                        liam@example.com
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      <Badge className="text-xs" variant="secondary">
-                        Fulfilled
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {value.dueDate}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">{value.price + " " + value.currency}</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <Edit className="text-primary"/>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                    <Trash className="text-destructive"/>
-                    </TableCell>
-                  </TableRow>
-                  })}
+                      <TableCell>
+                      <Link href={`/dashboard/invoices/details/${value.id}`}>
+                        {value.id}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                      <Link href={`/dashboard/invoices/details/${value.id}`}>
+                        <div className="font-medium">Liam Johnson</div>
+                        <div className="hidden text-sm text-muted-foreground md:inline">
+                          liam@example.com
+                        </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                      <Link href={`/dashboard/invoices/details/${value.id}`}>
+                        <Badge className="text-xs" variant="secondary">
+                          Fulfilled
+                        </Badge>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                      <Link href={`/dashboard/invoices/details/${value.id}`}>
+                        {value.dueDate}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                      <Link href={`/dashboard/invoices/details/${value.id}`}>
+                        {value.total + " " + value.currency}
+                        </Link></TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Link href={`/dashboard/invoices/update/${value.id}`}><Edit className="text-primary"/></Link>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Button onClick={async () => await deleteInvoice(value.id) } variant={"link"}>
+                          <Trash className="text-destructive"/>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                   
                   
                 </TableBody>

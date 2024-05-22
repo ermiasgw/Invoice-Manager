@@ -1,34 +1,6 @@
-import Image from "next/image"
+'use client'
 import Link from "next/link"
-import {
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  CreditCard,
-  File,
-  Home,
-  LineChart,
-  ListFilter,
-  MoreVertical,
-  Package,
-  Package2,
-  PanelLeft,
-  Search,
-  Settings,
-  ShoppingCart,
-  Truck,
-  Users2,
-} from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -38,300 +10,235 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Bird, PlusCircle, Rabbit, Trash, Turtle } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/components/ui/pagination"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import ProductsForm from "@/components/productsForm"
+import { useEffect, useState } from "react"
+import { useFormState, useFormStatus } from "react-dom"
+import { createInvoice } from "@/app/actions/invoice"
+import useSWR from "swr"
 
-export default function InvoiceList() {
+export default function UpdateInvoice({ params }: {params: any}) {
+  const id = params.id
+  const [fields, setFields] = useState<{ id: number; name: string; desc: string; type: string; price: string; }[]>(
+    [{ id: 1, name: '', desc: '', type: '', price: "" }])
+
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const { data: invoice, error: invoiceError } = useSWR(`/api/invoice/${id}`, fetcher)
+  
+  
+
+  useEffect(() => {
+    let defaultProducts: (() => { id: number; name: string; desc: string; type: string; price: string }[]) | { id: any; name: any; desc: any; type: any; price: any }[] = []
+    if (invoice && invoice.offerings) {
+      invoice.offerings.map((value: any, index: any) => {
+        defaultProducts.push({
+          id: index,
+          name: value.name,
+          desc: value.description,
+          type: value.type,
+          price: value.price
+        })
+      })
+    }
+    if (defaultProducts.length !==0 ){
+      setFields(defaultProducts)
+    }
+  }, [invoice]);
+
+  const [state, action] = useFormState<any, any>(createInvoice, undefined)
+  function Submit() {
+    const status = useFormStatus();
+    return <Button type="submit" aria-disabled={status.pending} className="w-full">
+    {status.pending ? 'Submitting...' : 'Submit'}
+    </Button>
+  }
+
+  const addField = () => {
+    const newField = { id: fields.length !== 0 ? calculateMaxId()+1 : 1, name: '', desc: '', type: '', price: "" };
+    setFields([...fields, newField]);
+  };
+
+  const calculateMaxId = () => {
+    const ids = fields.map(field => field.id);
+    return Math.max(...ids);
+  };
+
+  // Function to remove a field
+  const removeField = (idToRemove: number) => {
+    const updatedFields = fields.filter(field => field.id !== idToRemove);
+    setFields(updatedFields);
+  };
+
+  // Function to handle field value change
+  const handleFieldChange = ({id, name, desc, type, price}: {id: number, name?: string, desc?: string, type?: string, price?: string}) => {
+    const updatedFields = fields.map(field => {
+      if (field.id === id) {
+        return {
+          ...field,
+          name: name === undefined ? field.name : name,
+          desc: desc === undefined ? field.desc : desc,
+          type: type === undefined ? field.type : type,
+          price: price === undefined ? field.price : price,
+        }
+      }
+      return field;
+    });
+    setFields(updatedFields);
+  };
+
+
   return (
     <main className="grid p-10">
-          <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-            <div className="grid gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
-              <Card
-                className="sm:col-span-2" x-chunk="dashboard-05-chunk-0"
-              >
-                <CardHeader className="pb-3">
-                  <CardTitle>Your Invoices</CardTitle>
-                  <CardDescription className="max-w-lg text-balance leading-relaxed">
-                    Invoices that list products and services that you provided along with the price
-                  </CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <Button>Create New Invoice</Button>
-                </CardFooter>
-              </Card>
-              
-            </div>
-            <Tabs defaultValue="week">
-              <div className="flex items-center">
-                <TabsList>
-                  <TabsTrigger value="week">Week</TabsTrigger>
-                  <TabsTrigger value="month">Month</TabsTrigger>
-                  <TabsTrigger value="year">Year</TabsTrigger>
-                </TabsList>
-                <div className="ml-auto flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 gap-1 text-sm"
-                      >
-                        <ListFilter className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only">Filter</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuCheckboxItem checked>
-                        Fulfilled
-                      </DropdownMenuCheckboxItem>
-                      <DropdownMenuCheckboxItem>
-                        Declined
-                      </DropdownMenuCheckboxItem>
-                      <DropdownMenuCheckboxItem>
-                        Refunded
-                      </DropdownMenuCheckboxItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 gap-1 text-sm"
-                  >
-                    <File className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only">Export</span>
-                  </Button>
+      <form action={action}>
+      <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2 pb-5">
+    <Card >
+      <CardHeader>
+        <CardTitle>Invoice</CardTitle>
+        <CardDescription>
+          Main Invoice data
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+      <div className="grid gap-3">
+        <Label htmlFor="client">Client</Label>
+        <Select name="client">
+          <SelectTrigger
+            id="model"
+            className="items-start [&_[data-description]]:hidden"
+          >
+            <SelectValue placeholder="Select a client" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="genesis">
+              <div className="flex items-start gap-3 text-muted-foreground">
+                <Rabbit className="size-5" />
+                <div className="grid gap-0.5">
+                  <p>
+                    Neural{" "}
+                    <span className="font-medium text-foreground">
+                      Genesis
+                    </span>
+                  </p>
+                  <p className="text-xs" data-description>
+                    Our fastest model for general use cases.
+                  </p>
                 </div>
               </div>
-              <TabsContent value="week">
-                <Card x-chunk="dashboard-05-chunk-3">
-                  <CardHeader className="px-7">
-                    <CardTitle>Orders</CardTitle>
-                    <CardDescription>
-                      Recent orders from your store.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Customer</TableHead>
-                          <TableHead className="hidden sm:table-cell">
-                            Type
-                          </TableHead>
-                          <TableHead className="hidden sm:table-cell">
-                            Status
-                          </TableHead>
-                          <TableHead className="hidden md:table-cell">
-                            Date
-                          </TableHead>
-                          <TableHead className="text-right">Amount</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        <TableRow className="bg-accent">
-                          <TableCell>
-                            <div className="font-medium">Liam Johnson</div>
-                            <div className="hidden text-sm text-muted-foreground md:inline">
-                              liam@example.com
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            Sale
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <Badge className="text-xs" variant="secondary">
-                              Fulfilled
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            2023-06-23
-                          </TableCell>
-                          <TableCell className="text-right">$250.00</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <div className="font-medium">Olivia Smith</div>
-                            <div className="hidden text-sm text-muted-foreground md:inline">
-                              olivia@example.com
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            Refund
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <Badge className="text-xs" variant="outline">
-                              Declined
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            2023-06-24
-                          </TableCell>
-                          <TableCell className="text-right">$150.00</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <div className="font-medium">Noah Williams</div>
-                            <div className="hidden text-sm text-muted-foreground md:inline">
-                              noah@example.com
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            Subscription
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <Badge className="text-xs" variant="secondary">
-                              Fulfilled
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            2023-06-25
-                          </TableCell>
-                          <TableCell className="text-right">$350.00</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <div className="font-medium">Emma Brown</div>
-                            <div className="hidden text-sm text-muted-foreground md:inline">
-                              emma@example.com
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            Sale
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <Badge className="text-xs" variant="secondary">
-                              Fulfilled
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            2023-06-26
-                          </TableCell>
-                          <TableCell className="text-right">$450.00</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <div className="font-medium">Liam Johnson</div>
-                            <div className="hidden text-sm text-muted-foreground md:inline">
-                              liam@example.com
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            Sale
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <Badge className="text-xs" variant="secondary">
-                              Fulfilled
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            2023-06-23
-                          </TableCell>
-                          <TableCell className="text-right">$250.00</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <div className="font-medium">Liam Johnson</div>
-                            <div className="hidden text-sm text-muted-foreground md:inline">
-                              liam@example.com
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            Sale
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <Badge className="text-xs" variant="secondary">
-                              Fulfilled
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            2023-06-23
-                          </TableCell>
-                          <TableCell className="text-right">$250.00</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <div className="font-medium">Olivia Smith</div>
-                            <div className="hidden text-sm text-muted-foreground md:inline">
-                              olivia@example.com
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            Refund
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <Badge className="text-xs" variant="outline">
-                              Declined
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            2023-06-24
-                          </TableCell>
-                          <TableCell className="text-right">$150.00</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <div className="font-medium">Emma Brown</div>
-                            <div className="hidden text-sm text-muted-foreground md:inline">
-                              emma@example.com
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            Sale
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell">
-                            <Badge className="text-xs" variant="secondary">
-                              Fulfilled
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            2023-06-26
-                          </TableCell>
-                          <TableCell className="text-right">$450.00</TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </main>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid gap-3 mt-4">
+        <Label htmlFor="status">Status</Label>
+        <Input id="status" type="string" name="status" placeholder="0.4" />
+      </div>
+      <div className="grid gap-3 mt-4">
+        <Label htmlFor="currency">Currency</Label>
+        <Input id="currency" type="string" name="currency" placeholder="Birr" />
+      </div>
+      <div className="grid gap-3 mt-4">
+        <Label htmlFor="date">Date</Label>
+        <Input id="date" type="datetime-local" name="date" />
+      </div>
+      </CardContent>
+    </Card>
+  <Card >
+      <CardHeader>
+        <CardTitle>Products or Services</CardTitle>
+        <CardDescription>
+          Add Products or Services that you provided
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="w-[150px]">Type</TableHead>
+              <TableHead className="w-[150px]">Price</TableHead>
+              <TableHead className="w-[20px]"></TableHead>
+
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+          {fields.map((field, index) => (
+              <TableRow key={index}>
+              <TableCell className="font-semibold">
+                  <Input
+                  id={`name_${field.id}`}
+                  type="string"
+                  value={field.name}
+                  name={`name_${field.id}`}
+                  onChange={(e) => handleFieldChange({id:field.id, name: e.target.value})}
+                  placeholder="Name"
+                  />             
+              </TableCell>
+              <TableCell>
+              <Input
+                  id={`description_${field.id}`}
+                  type="string"
+                  value={field.desc}
+                  name={`description_${field.id}`}
+                  onChange={(e) => handleFieldChange({id:field.id, desc: e.target.value})}
+                  placeholder="Description"
+              />
+              </TableCell>
+              <TableCell>
+              <Input
+                  id={`type_${field.id}`}
+                  type="string"
+                  value={field.type}
+                  name={`type_${field.id}`}
+                  onChange={(e) => handleFieldChange({id:field.id, type: e.target.value})}
+                  placeholder="Type"
+              />
+              </TableCell>
+              <TableCell>
+                  <Input
+                  type="number"
+                  id={`price_${field.id}`}
+                  value={field.price}
+                  name={`price_${field.id}`}
+                  onChange={(e) => handleFieldChange({id:field.id, price: e.target.value})}
+                  placeholder="Price"
+                  />
+              </TableCell>
+              <TableCell>
+              <Button onClick={() => removeField(field.id)} variant={"link"}><Trash /></Button>
+              </TableCell>
+          </TableRow>
+          ))}
+            
+          </TableBody>
+        </Table>
+      </CardContent>
+      <CardFooter className="justify-center border-t p-4">
+        <Button size="sm" variant="ghost" className="gap-1" onClick={addField}>
+          <PlusCircle className="h-3.5 w-3.5" />
+          Add Variant
+        </Button>
+      </CardFooter>
+    </Card>
+
+    <Submit />
+    
+    </div>
+    <input hidden type="string" name="ids" value={fields.map(field => field.id).join(',')} id="" />
+    
+    </form>
+    
+  </main>
   )
 }

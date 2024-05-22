@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -75,8 +76,25 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { usePathname, useSearchParams } from "next/navigation"
+import useSWR from "swr"
+import { useEffect, useState } from "react"
+import { URLSearchParams } from "url"
 
-export default function InvoiceList() {
+
+export default function InvoiceList({ params }: {params: any}) {
+  const id = params.id
+
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const { data: invoice, error: invoiceError } = useSWR(`/api/invoice/${id}`, fetcher)
+
+  const { data: user, error: userError } = useSWR(`/api/user`, fetcher)
+
+  if (invoiceError || userError) {
+    return <p>no data</p>
+  }
+
+
   return (
     <main className="grid p-20 pt-10">
       <Card
@@ -86,9 +104,9 @@ export default function InvoiceList() {
           <CardTitle>Invoice Detail
             
           <span className="float-right"> 
-            <Button className="mr-4" variant={"outline"}>Edit</Button>
+            <Link href={`/dashboard/invoices/update/${id}`} className="mr-4" >Edit</Link>
             <Button variant={"secondary"}>Export</Button>
-          </span>
+          </span> n
           
         </CardTitle>
           
@@ -97,30 +115,30 @@ export default function InvoiceList() {
         <CardContent>
           <div className="grid p-10" >
             <div className="justify-self-start">
-              <h3>name: <span>kfdjlkj</span></h3>
-              <h3>email: <span>kfdjlkj</span></h3>
-              <h3>Invoice Id: <span>kfdjlkj</span></h3>
-              <h3>Date: <span>kfdjlkj</span></h3>
+              <h3>name: <span>{user ? user.name : ""}</span></h3>
+              <h3>email: <span>{user ? user.email : ""}</span></h3>
+              <h3>Invoice Id: <span>{id}</span></h3>
+              <h3>Date: <span>{invoice ? invoice.dueDate: ""}</span></h3>
             </div>
             <div className="justify-self-end">
                 <h3>Client name: <span>kfdjlkj</span></h3>
                 <h3>Client email: <span>kfdjlkj</span></h3>
                 <h3>Invoice status: <span>kffffdjlkj</span></h3>
-                <h3>Total: <span>kfdjlkj</span></h3>
+                <h3>Total: <span>{invoice ? invoice.total + " " + invoice.currency: ""}</span></h3>
             </div>
           </div>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="hidden sm:table-cell">Id</TableHead>
-                <TableHead>Client</TableHead>
+                <TableHead className="hidden sm:table-cell">Name</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead className="hidden sm:table-cell">
                   Status
                 </TableHead>
                 <TableHead className="hidden md:table-cell">
                   Date
                 </TableHead>
-                <TableHead className="hidden md:table-cell">Total</TableHead>
+                <TableHead className="hidden md:table-cell">Price</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
