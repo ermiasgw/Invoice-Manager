@@ -90,7 +90,6 @@ export default function InvoiceList() {
   const { data: user, error: userError } = useSWR(`/api/user`, fetcher)
 
   const downloadFile = async () => {
-    console.log("here")
     try {
       // Make a POST request to the API route to download the file
       const response = await fetch(`http://127.0.0.1:4000/export/pdf/all/${user.id}`, {
@@ -103,6 +102,31 @@ export default function InvoiceList() {
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'invoices.zip');
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up after download
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
+
+  const downloadExcel = async () => {
+    try {
+      // Make a POST request to the API route to download the file
+      const response = await fetch(`http://127.0.0.1:4000/export/excel/all/${user.id}`, {
+        method: 'GET',
+      });
+
+      // Trigger the download by creating a blob URL and clicking a link
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'invoices.xlsx');
       document.body.appendChild(link);
       link.click();
 
@@ -177,7 +201,16 @@ export default function InvoiceList() {
               onClick={downloadFile}
             >
               <File className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only">Export</span>
+              <span className="sr-only sm:not-sr-only">Export Pdf</span>
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 gap-1 text-sm"
+              onClick={downloadExcel}
+            >
+              <File className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only">Export Excel</span>
             </Button>
           </div>
         </div>

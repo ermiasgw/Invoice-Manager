@@ -23,6 +23,7 @@ export class ExportController {
     return new StreamableFile(buffer);
   }
 
+  @Public()
   @Get('/pdf/:id')
   async exportOne(@Param('id') id: string, @Res({ passthrough: true }) res: Response) {
     const buffer = await this.exportService.exportOne(id);
@@ -35,9 +36,10 @@ export class ExportController {
     return new StreamableFile(buffer);
   }
 
-  @Get('/excel')
-  async exportExcel(@Res({ passthrough: true }) res: Response) {
-    const userId = 1
+  @Public()
+  @Get('/excel/all/:id')
+  async exportExcel(@Param('id', ParseIntPipe) id: number, @Res({ passthrough: true }) res: Response) {
+    const userId = id
     const buffer = await this.exportService.exportExcel(userId);
 
     res.set({

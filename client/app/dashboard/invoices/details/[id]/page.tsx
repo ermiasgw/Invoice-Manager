@@ -90,6 +90,30 @@ export default function InvoiceList({ params }: {params: any}) {
 
   const { data: user, error: userError } = useSWR(`/api/user`, fetcher)
 
+  const downloadFile = async () => {
+    try {
+      // Make a POST request to the API route to download the file
+      const response = await fetch(`http://127.0.0.1:4000/export/pdf/${id}`, {
+        method: 'GET',
+      });
+
+      // Trigger the download by creating a blob URL and clicking a link
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoices_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up after download
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
   if (invoiceError || userError) {
     return <p>no data</p>
   }
@@ -104,9 +128,9 @@ export default function InvoiceList({ params }: {params: any}) {
           <CardTitle>Invoice Detail
             
           <span className="float-right"> 
-            <Link href={`/dashboard/invoices/update/${id}`} className="mr-4" >Edit</Link>
-            <Button variant={"secondary"}>Export</Button>
-          </span> n
+            <Button variant={"secondary"} className="mr-4"><Link href={`/dashboard/invoices/update/${id}`} >Edit</Link></Button>
+            <Button variant={"secondary"} onClick={downloadFile}>Export</Button>
+          </span>
           
         </CardTitle>
           
