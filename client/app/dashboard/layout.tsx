@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -55,6 +56,7 @@ import {
 } from "@/components/ui/tooltip"
 
 import { dashboard_links } from "@/lib/links"
+import { logout } from "../actions/auth"
 
 //todo: extract links to dictionary for fast edit
 
@@ -170,7 +172,7 @@ export default function RootLayout({
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem ><Button variant={"link"} onClick={async () => await logout()}>Logout</Button></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>

@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,11 +11,17 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signin } from "@/app/actions/auth"
+import { useActionState } from "react"
 import { useFormStatus, useFormState } from "react-dom"
 
 export default function LoginForm() {
   const [state, action] = useFormState(signin, undefined)
-  const { pending } = useFormStatus()
+  function Submit() {
+    const status = useFormStatus();
+    return <Button type="submit" aria-disabled={status.pending} className="w-full">
+    {status.pending ? 'Submitting...' : 'Login'}
+    </Button>
+  }
 
   return (
     <Card className="mx-auto max-w-sm mt-10">
@@ -33,19 +39,20 @@ export default function LoginForm() {
             <Input
               id="email"
               type="email"
+              name="email"
               placeholder="m@example.com"
               required
             />
             {state?.errors?.email && <p>{state.errors.email}</p>}
+          
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required />
+            <Input id="password" name="password" type="password" required />
             {state?.errors?.password && <p>{state.errors.password}</p>}
           </div>
-          <Button type="submit" className="w-full">
-          {pending ? 'Submitting...' : 'Login'}
-          </Button>
+          {state?.messages && <p>{state.messages}</p>}
+          <Submit />
         </div>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}

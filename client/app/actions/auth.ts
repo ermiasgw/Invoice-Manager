@@ -1,5 +1,8 @@
 'use server'
 import { SignupFormSchema, FormState, SigninFormSchema } from '@/lib/definitions'
+import { redirect } from 'next/navigation'
+import { deleteSession, createSession } from '@/lib/sessions'
+
  
 export async function signup(state: FormState, formData: any) {
   // Validate form fields
@@ -15,9 +18,29 @@ export async function signup(state: FormState, formData: any) {
       errors: validatedFields.error.flatten().fieldErrors,
     }
   }
-  return {
-      
+
+  const res = await fetch(`${process.env.BACKEND_URL}/users`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: validatedFields.data.name,
+      email: validatedFields.data.email,
+      password: validatedFields.data.password
+    })
+  });
+
+  const response = await res.json();
+
+
+  if (res.ok) {
+    redirect('/signin')
+  }
+  else {
+    return {
+      messages: response.message,
     }
+  }
+
   // Call the provider or db to create a user...
 }
 
@@ -34,9 +57,28 @@ export async function signin(state: FormState, formData: any) {
         errors: validatedFields.error.flatten().fieldErrors,
       }
     }
-   
-    // Call the provider or db to create a user...
+
+    const res = await fetch(`${process.env.BACKEND_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: validatedFields.data.email,
+        password: validatedFields.data.password
+      })
+    });
+
+    const response = await res.json();
+
+    if (res.ok && response) {
+      await createSession(response)
+      redirect('/dashboard/invoices')
+    }
+
+    return {messages: "email or password incorrect"}
   }
 
-  export async function logout(state: FormState, formData: any) {}
-  
+ 
+  export async function logout() {
+    deleteSession()
+    redirect('/signin')
+  }  

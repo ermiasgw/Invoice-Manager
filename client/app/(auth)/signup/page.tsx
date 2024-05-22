@@ -18,8 +18,12 @@ import { useFormStatus, useFormState } from 'react-dom'
 
 export default function SignupForm() {
   const [state, action] = useFormState(signup, undefined)
-  const { pending } = useFormStatus()
-
+  function Submit() {
+    const status = useFormStatus();
+    return <Button type="submit" aria-disabled={status.pending} className="w-full">
+    {status.pending ? 'Submitting...' : 'Create an account'}
+    </Button>
+  }
 
   return (
     <Card className="mx-auto max-w-sm mt-10">
@@ -34,7 +38,7 @@ export default function SignupForm() {
         <div className="grid gap-4">
             <div className="grid gap-2">
                 <Label htmlFor="first-name">Name</Label>
-                <Input id="name" placeholder="Max" required />
+                <Input id="name" name="name" placeholder="Max" required />
                 {state?.errors?.name && <p>{state.errors.name}</p>}
             </div>
           <div className="grid gap-2">
@@ -42,6 +46,7 @@ export default function SignupForm() {
             <Input
               id="email"
               type="email"
+              name="email"
               placeholder="m@example.com"
               required
             />
@@ -49,12 +54,11 @@ export default function SignupForm() {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" />
+            <Input id="password" name="password" type="password" />
             {state?.errors?.password && <p>{state.errors.password}</p>}
           </div>
-          <Button type="submit" className="w-full">
-            {pending ? 'Submitting...' : 'Create an account'}
-          </Button>
+          {state?.messages && <p>{state.messages}</p>}
+          <Submit />
         </div>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}

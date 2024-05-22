@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { date, z } from 'zod'
  
 export const SignupFormSchema = z.object({
   name: z
@@ -26,3 +26,33 @@ export type FormState =
       message?: string
     }
   | undefined
+
+export type SessionPayload = {
+  user: {id: number,
+  name: string,
+  email: string,
+  role: string,
+  }
+  access_token: string
+}
+
+export const createInvoiceFormSchema = z.object({
+  client: z
+    .string()
+    .trim(),
+  status: z.string().trim(),
+  currency: z.string().trim(),
+  date: z.string()  
+    
+})
+
+export const CreateProductSchema = z.object({
+    name: z
+      .string()
+      .min(1, { message: 'Name must be at least 2 characters long.' })
+      .trim(),
+    description: z.string().trim(),
+    type: z.string(),
+    price: z.number().min(0, 'price must be greater than 0')
+    
+})
