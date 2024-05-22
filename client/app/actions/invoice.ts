@@ -190,6 +190,26 @@ export async function updateInvoice(state: FormState, formData: any) {
 
 
 export async function deleteInvoice(id: string) {
+    const cookie = cookies().get('session')?.value
+    const session = await decrypt(cookie)
+    
+    const res = await fetch(`${process.env.BACKEND_URL}/invoice/${id}`, {
+        method: 'DELETE',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`
+         }
+      });
 
+      const response = await res.json()
+
+      if (res.ok) {
+        redirect('/dashboard/invoices')
+      }
+      else {
+        return {
+          messages: response.message,
+        }
+      }
 
 }
