@@ -246,12 +246,12 @@ export default function UpdateInvoice({ params }: {params: any}) {
         </Table>
       </CardContent>
       <CardFooter className="justify-center border-t p-4">
-        <Button size="sm" variant="ghost" className="gap-1" onClick={addField}>
+        <Button size="sm" variant="ghost" className="gap-1 mr-24" onClick={addField}>
           <PlusCircle className="h-3.5 w-3.5" />
           Add Variant
         </Button>
 
-        <div className="float-right pl-50">total: <span>{total} Birr</span></div>
+        <div className="float-right ">total: <span>{total} Birr</span></div>
       </CardFooter>
     </Card>
 

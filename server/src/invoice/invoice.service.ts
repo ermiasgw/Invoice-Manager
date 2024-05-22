@@ -83,7 +83,6 @@ export class InvoiceService {
           id,
         }
       })
-      console.log(offer)
       if (offer){
         await this.prisma.offering.update({
           where: { id },
