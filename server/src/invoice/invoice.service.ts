@@ -9,7 +9,7 @@ export class InvoiceService {
   constructor(private prisma: DatabaseService) {}
   
   async create(data: Prisma.InvoiceCreateInput) {
-    return this.prisma.invoice.create({
+    return await this.prisma.invoice.create({
       data: data,
       include: {
         offerings: true
@@ -18,11 +18,16 @@ export class InvoiceService {
   }
 
   async findAll(id: number) {
-    return this.prisma.invoice.findMany({
+    const invoices = await this.prisma.invoice.findMany({
       where: {
         userId: id,
       },
-    })
+    });
+    if (!invoices) {
+      throw new NotFoundException('Invoice not found');
+    };
+
+    return invoices
   }
 
   async findOne(id: string) {
@@ -58,7 +63,7 @@ export class InvoiceService {
   async remove(id: string) {
     const invoice = await this.findOne(id)
 
-    return this.prisma.invoice.delete({
+    return await this.prisma.invoice.delete({
       where: {
         id,
       }
@@ -66,7 +71,7 @@ export class InvoiceService {
   }
 
   async removeOffers(ids: number[]) {
-    return this.prisma.offering.deleteMany({
+    return await this.prisma.offering.deleteMany({
       where: {
         id: {
           in: ids

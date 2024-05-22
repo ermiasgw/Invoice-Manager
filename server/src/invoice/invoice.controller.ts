@@ -30,7 +30,7 @@ export class InvoiceController {
 
   @Get()
   findAll(@User() user) {
-    const userId = user.userId
+    const userId = user.id
     return this.invoiceService.findAll(userId);
   }
 

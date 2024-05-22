@@ -3,7 +3,7 @@ import { CreateProductSchema, FormState, createInvoiceFormSchema } from "@/lib/d
 import { cookies } from 'next/headers'
 
 import { decrypt } from "@/lib/sessions";
-import { redirect } from "next/navigation";
+import { RedirectType, redirect } from "next/navigation";
 
 export async function createInvoice(state: any, formData: any) {
 
@@ -192,7 +192,7 @@ export async function updateInvoice(state: FormState, formData: any) {
 export async function deleteInvoice(id: string) {
     const cookie = cookies().get('session')?.value
     const session = await decrypt(cookie)
-    
+
     const res = await fetch(`${process.env.BACKEND_URL}/invoice/${id}`, {
         method: 'DELETE',
         headers: { 
@@ -204,7 +204,7 @@ export async function deleteInvoice(id: string) {
       const response = await res.json()
 
       if (res.ok) {
-        redirect('/dashboard/invoices')
+        redirect('/dashboard')
       }
       else {
         return {
