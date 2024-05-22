@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const session = await decrypt(cookie)
 
 
-  const res = await fetch(`${process.env.BACKEND_URL}/invoice`, {
+  const res = await fetch(`${process.env.BACKEND_URL}/invoice/`, {
     method: 'GET',
     headers: { 
         'Content-Type': 'application/json',
