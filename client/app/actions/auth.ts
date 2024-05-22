@@ -21,7 +21,7 @@ export async function signup(state: FormState, formData: any) {
 
   const res = await fetch(`${process.env.BACKEND_URL}/users`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Accept':'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
       name: validatedFields.data.name,
       email: validatedFields.data.email,
