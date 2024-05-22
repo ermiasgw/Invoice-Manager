@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Res, StreamableFile,
 import { ExportService } from './export.service';
 import { Response } from 'express';
 import * as ExcelJS from 'exceljs';
-import { Public } from 'src/auth/auth.decorator';
+import { Public } from '../auth/auth.decorator';
 
 
 @Controller('export')
