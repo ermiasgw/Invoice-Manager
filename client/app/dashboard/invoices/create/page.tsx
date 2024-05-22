@@ -23,20 +23,34 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import ProductsForm from "@/components/productsForm"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useFormState, useFormStatus } from "react-dom"
 import { createInvoice } from "@/app/actions/invoice"
 
 export default function CreateInvoice() {
   const [fields, setFields] = useState<{ id: number; name: string; desc: string; type: string; price: string; }[]>([{ id: 1, name: '', desc: '', type: '', price: "" }])
   const [state, action] = useFormState<any, any>(createInvoice, undefined)
-  console.log(state?.errors)
+  const [total, setTotal] = useState(0)
   function Submit() {
     const status = useFormStatus();
     return <Button type="submit" aria-disabled={status.pending} className="w-full">
     {status.pending ? 'Submitting...' : 'Submit'}
     </Button>
   }
+
+
+  useEffect(() => {
+    let sum = 0
+
+    fields.map((value) => {
+      if (value?.price && parseFloat(value?.price)) {
+        sum = sum + parseFloat(value?.price)
+      }
+    })
+
+    setTotal(sum)
+  }, [fields])
+  
 
   const addField = () => {
     const newField = { id: fields.length !== 0 ? calculateMaxId()+1 : 1, name: '', desc: '', type: '', price: "" };
@@ -95,35 +109,25 @@ export default function CreateInvoice() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="genesis">
-              <div className="flex items-start gap-3 text-muted-foreground">
-                <Rabbit className="size-5" />
-                <div className="grid gap-0.5">
-                  <p>
-                    Neural{" "}
-                    <span className="font-medium text-foreground">
-                      Genesis
-                    </span>
-                  </p>
-                  <p className="text-xs" data-description>
-                    Our fastest model for general use cases.
-                  </p>
-                </div>
-              </div>
+                <div className="font-medium">Liam Johnson</div>
+                    <div className="hidden text-sm text-muted-foreground md:inline">
+                      liam@example.com
+                  </div>
             </SelectItem>
           </SelectContent>
         </Select>
       </div>
       <div className="grid gap-3 mt-4">
-        <Label htmlFor="status">Status</Label>
-        <Input id="status" type="string" name="status" placeholder="0.4" />
+        <Label htmlFor="currency">Currency</Label>
+        <Input id="currency" type="string" name="currency" value="Birr" hidden />
       </div>
       <div className="grid gap-3 mt-4">
-        <Label htmlFor="currency">Currency</Label>
-        <Input id="currency" type="string" name="currency" placeholder="Birr" />
+        <Label htmlFor="status">Status</Label>
+        <Input id="status" type="string" name="status" value="" hidden />
       </div>
       <div className="grid gap-3 mt-4">
         <Label htmlFor="date">Date</Label>
-        <Input id="date" type="datetime-local" name="date" />
+        <Input id="date" type="datetime-local" name="date" required />
       </div>
       </CardContent>
     </Card>
@@ -157,6 +161,7 @@ export default function CreateInvoice() {
                   name={`name_${field.id}`}
                   onChange={(e) => handleFieldChange({id:field.id, name: e.target.value})}
                   placeholder="Name"
+                  required
                   />             
               </TableCell>
               <TableCell>
@@ -173,10 +178,11 @@ export default function CreateInvoice() {
               <Input
                   id={`type_${field.id}`}
                   type="string"
-                  value={field.type}
                   name={`type_${field.id}`}
                   onChange={(e) => handleFieldChange({id:field.id, type: e.target.value})}
                   placeholder="Type"
+                  value="Product"
+                  hidden
               />
               </TableCell>
               <TableCell>
@@ -187,6 +193,7 @@ export default function CreateInvoice() {
                   name={`price_${field.id}`}
                   onChange={(e) => handleFieldChange({id:field.id, price: e.target.value})}
                   placeholder="Price"
+                  required
                   />
               </TableCell>
               <TableCell>
@@ -199,17 +206,23 @@ export default function CreateInvoice() {
         </Table>
       </CardContent>
       <CardFooter className="justify-center border-t p-4">
-        <Button size="sm" variant="ghost" className="gap-1" onClick={addField}>
+        <Button size="sm" variant="ghost" className="gap-1 mr-24" onClick={addField}>
           <PlusCircle className="h-3.5 w-3.5" />
-          Add Variant
+          Add Product
         </Button>
+
+        <div className="float-right pl-50">total: <span>{total} Birr</span></div>
       </CardFooter>
     </Card>
+
+    {state?.errors && <p>{JSON.stringify(state?.errors)}</p>}
+    {state?.messages && <p>{JSON.stringify(state?.messages)}</p>}
 
     <Submit />
     
     </div>
     <input hidden type="string" name="ids" value={fields.map(field => field.id).join(',')} id="" />
+
     
     </form>
     

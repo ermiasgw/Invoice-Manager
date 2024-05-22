@@ -2,14 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { User } from '../users/user.decorator';
 
 @Controller('invoice')
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
   @Post()
-  create(@Body() createInvoiceDto: CreateInvoiceDto) {
-    const userId = 1; //fetch the current authenticated user
+  create(@User() user, @Body() createInvoiceDto: CreateInvoiceDto) {
+    const userId = user.id; //fetch the current authenticated user
     const offers = createInvoiceDto.offerings
     const { offerings, ...invoice } = createInvoiceDto;
     const total = offers.reduce((acc, curr) => acc + Number(curr.price), 0)
@@ -28,8 +29,8 @@ export class InvoiceController {
   }
 
   @Get()
-  findAll() {
-    const userId = 1
+  findAll(@User() user) {
+    const userId = user.userId
     return this.invoiceService.findAll(userId);
   }
 

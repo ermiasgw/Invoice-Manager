@@ -145,9 +145,9 @@ export default function InvoiceList({ params }: {params: any}) {
               <h3>Date: <span>{invoice ? invoice.dueDate: ""}</span></h3>
             </div>
             <div className="justify-self-end">
-                <h3>Client name: <span>kfdjlkj</span></h3>
-                <h3>Client email: <span>kfdjlkj</span></h3>
-                <h3>Invoice status: <span>kffffdjlkj</span></h3>
+                <h3>Client name: <span>Liam Johnson</span></h3>
+                <h3>Client email: <span>liam@example.com</span></h3>
+                <h3>Invoice status: <span>active</span></h3>
                 <h3>Total: <span>{invoice ? invoice.total + " " + invoice.currency: ""}</span></h3>
             </div>
           </div>
@@ -160,33 +160,34 @@ export default function InvoiceList({ params }: {params: any}) {
                   Status
                 </TableHead>
                 <TableHead className="hidden md:table-cell">
-                  Date
+                  Type
                 </TableHead>
                 <TableHead className="hidden md:table-cell">Price</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow className="bg-accent">
+              {invoice && invoice.offerings.map((value: any, index: any) => (
+                <TableRow key={index} className="bg-accent">
                 <TableCell>
-                  1
+                {value.name}
                 </TableCell>
                 <TableCell>
-                  <div className="font-medium">Liam Johnson</div>
-                  <div className="hidden text-sm text-muted-foreground md:inline">
-                    liam@example.com
-                  </div>
+                  {value.description}
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">
                   <Badge className="text-xs" variant="secondary">
-                    Fulfilled
+                    Active
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  2023-06-23
+                  {value.type}
                 </TableCell>
-                <TableCell className="hidden md:table-cell">$250.00</TableCell>
+                <TableCell className="hidden md:table-cell">{value.price}</TableCell>
                 
               </TableRow>
+
+              ))}
+              
               
             </TableBody>
           </Table>

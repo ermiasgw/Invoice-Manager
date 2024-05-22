@@ -33,9 +33,11 @@ export default function UpdateInvoice({ params }: {params: any}) {
   const [fields, setFields] = useState<{ id: number; name: string; desc: string; type: string; price: string; }[]>(
     [{ id: 1, name: '', desc: '', type: '', price: "" }])
 
+  const [total, setTotal] = useState(0)
+
+
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data: invoice, error: invoiceError } = useSWR(`/api/invoice/${id}`, fetcher)
-  
   
 
   useEffect(() => {
@@ -55,6 +57,18 @@ export default function UpdateInvoice({ params }: {params: any}) {
       setFields(defaultProducts)
     }
   }, [invoice]);
+
+  useEffect(() => {
+    let sum = 0
+
+    fields.map((value) => {
+      if (value?.price && parseFloat(value?.price)) {
+        sum = sum + parseFloat(value?.price)
+      }
+    })
+
+    setTotal(sum)
+  }, [fields])
 
   const [state, action] = useFormState<any, any>(createInvoice, undefined)
   function Submit() {
@@ -96,6 +110,20 @@ export default function UpdateInvoice({ params }: {params: any}) {
     });
     setFields(updatedFields);
   };
+  function convertIsoToCustomFormat(isoString: any) {
+    const date = new Date(isoString);
+  
+    // Pad function to ensure two digits
+    const pad = (number: any) => number.toString().padStart(2, '0');
+  
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1); // Months are 0-based
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+  
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
 
 
   return (
@@ -121,35 +149,25 @@ export default function UpdateInvoice({ params }: {params: any}) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="genesis">
-              <div className="flex items-start gap-3 text-muted-foreground">
-                <Rabbit className="size-5" />
-                <div className="grid gap-0.5">
-                  <p>
-                    Neural{" "}
-                    <span className="font-medium text-foreground">
-                      Genesis
-                    </span>
-                  </p>
-                  <p className="text-xs" data-description>
-                    Our fastest model for general use cases.
-                  </p>
-                </div>
-              </div>
+                <div className="font-medium">Liam Johnson</div>
+                    <div className="hidden text-sm text-muted-foreground md:inline">
+                      liam@example.com
+                  </div>
             </SelectItem>
           </SelectContent>
         </Select>
       </div>
       <div className="grid gap-3 mt-4">
         <Label htmlFor="status">Status</Label>
-        <Input id="status" type="string" name="status" placeholder="0.4" />
+        <Input id="status" type="string" name="status" value="" hidden />
       </div>
       <div className="grid gap-3 mt-4">
         <Label htmlFor="currency">Currency</Label>
-        <Input id="currency" type="string" name="currency" placeholder="Birr" />
+        <Input id="currency" type="string" name="currency" value="Birr" hidden />
       </div>
       <div className="grid gap-3 mt-4">
         <Label htmlFor="date">Date</Label>
-        <Input id="date" type="datetime-local" name="date" />
+        <Input id="date" type="datetime-local" defaultValue={invoice? convertIsoToCustomFormat(invoice.dueDate): ""}  name="date"/>
       </div>
       </CardContent>
     </Card>
@@ -183,6 +201,7 @@ export default function UpdateInvoice({ params }: {params: any}) {
                   name={`name_${field.id}`}
                   onChange={(e) => handleFieldChange({id:field.id, name: e.target.value})}
                   placeholder="Name"
+                  required
                   />             
               </TableCell>
               <TableCell>
@@ -199,10 +218,11 @@ export default function UpdateInvoice({ params }: {params: any}) {
               <Input
                   id={`type_${field.id}`}
                   type="string"
-                  value={field.type}
+                  value="Product"
                   name={`type_${field.id}`}
                   onChange={(e) => handleFieldChange({id:field.id, type: e.target.value})}
                   placeholder="Type"
+                  hidden
               />
               </TableCell>
               <TableCell>
@@ -213,6 +233,7 @@ export default function UpdateInvoice({ params }: {params: any}) {
                   name={`price_${field.id}`}
                   onChange={(e) => handleFieldChange({id:field.id, price: e.target.value})}
                   placeholder="Price"
+                  required
                   />
               </TableCell>
               <TableCell>
@@ -229,8 +250,13 @@ export default function UpdateInvoice({ params }: {params: any}) {
           <PlusCircle className="h-3.5 w-3.5" />
           Add Variant
         </Button>
+
+        <div className="float-right pl-50">total: <span>{total} Birr</span></div>
       </CardFooter>
     </Card>
+
+    {state?.errors && <p>{JSON.stringify(state?.errors)}</p>}
+    {state?.messages && <p>{JSON.stringify(state?.messages)}</p>}
 
     <Submit />
     

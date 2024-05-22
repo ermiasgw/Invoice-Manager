@@ -3,6 +3,7 @@ import { CreateProductSchema, FormState, createInvoiceFormSchema } from "@/lib/d
 import { cookies } from 'next/headers'
 
 import { decrypt } from "@/lib/sessions";
+import { redirect } from "next/navigation";
 
 export async function createInvoice(state: any, formData: any) {
 
@@ -86,8 +87,14 @@ export async function createInvoice(state: any, formData: any) {
       });
 
       const response = await res.json()
-      console.log(response)
-
+      if (res.ok) {
+        redirect('/dashboard/invoices')
+      }
+      else {
+        return {
+          messages: response.message,
+        }
+      }
 }
 export async function updateInvoice(state: FormState, formData: any) {
     let errors: any = {}
@@ -169,6 +176,15 @@ export async function updateInvoice(state: FormState, formData: any) {
       });
 
       const response = await res.json()
+
+      if (res.ok) {
+        redirect('/dashboard/invoices')
+      }
+      else {
+        return {
+          messages: response.message,
+        }
+      }
 
 }
 

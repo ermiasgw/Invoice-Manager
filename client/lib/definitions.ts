@@ -49,10 +49,8 @@ export const createInvoiceFormSchema = z.object({
 export const CreateProductSchema = z.object({
     name: z
       .string()
-      .min(1, { message: 'Name must be at least 2 characters long.' })
       .trim(),
     description: z.string().trim(),
     type: z.string(),
     price: z.number().min(0, 'price must be greater than 0')
-    
 })
