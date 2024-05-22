@@ -87,6 +87,33 @@ export default function InvoiceList() {
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR('/api/invoice', fetcher)
 
+  const { data: user, error: userError } = useSWR(`/api/user`, fetcher)
+
+  const downloadFile = async () => {
+    console.log("here")
+    try {
+      // Make a POST request to the API route to download the file
+      const response = await fetch(`http://127.0.0.1:4000/export/pdf/all/${user.id}`, {
+        method: 'GET',
+      });
+
+      // Trigger the download by creating a blob URL and clicking a link
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'invoices.zip');
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up after download
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
   if (error) {
     return (<p>no data</p>)
   }
@@ -147,6 +174,7 @@ export default function InvoiceList() {
               size="sm"
               variant="outline"
               className="h-7 gap-1 text-sm"
+              onClick={downloadFile}
             >
               <File className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only">Export</span>

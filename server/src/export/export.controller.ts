@@ -1,16 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, StreamableFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, StreamableFile, ParseIntPipe } from '@nestjs/common';
 import { ExportService } from './export.service';
 import { Response } from 'express';
 import * as ExcelJS from 'exceljs';
+import { Public } from 'src/auth/auth.decorator';
 
 
 @Controller('export')
 export class ExportController {
   constructor(private readonly exportService: ExportService) {}
 
-  @Get('/pdf')
-  async exportAll(@Res({ passthrough: true }) res: Response) {
-    const userId = 1
+  @Public()
+  @Get('/pdf/all/:id')
+  async exportAll(@Param('id', ParseIntPipe) id: number, @Res({ passthrough: true }) res: Response) {
+    const userId = id
     const buffer = await this.exportService.exportAll(userId);
 
     res.set({
