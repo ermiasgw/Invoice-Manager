@@ -1,13 +1,25 @@
 import { cookies } from 'next/headers'
+
+import { decrypt } from "@/lib/sessions";
  
 export async function GET(request: Request) {
-    const res = await fetch('https://data.mongodb-api.com/...', {
-        headers: {
-          'Content-Type': 'application/json',
-          'API-Key': process.env.DATA_API_KEY,
-        },
-      })
-      const data = await res.json()
-     
-    return Response.json({ data })
+  const cookie = cookies().get('session')?.value
+  const session = await decrypt(cookie)
+
+
+  const res = await fetch(`${process.env.BACKEND_URL}/invoice`, {
+    method: 'GET',
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`
+     },
+  });
+
+  const response = await res.json()
+  console.log(response)
+    
+  if (res.ok) {
+    return Response.json({ response })
+  }
+    
 }

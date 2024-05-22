@@ -123,7 +123,7 @@ export default function CreateInvoice() {
       </div>
       <div className="grid gap-3 mt-4">
         <Label htmlFor="date">Date</Label>
-        <Input id="date" type="date" name="date" />
+        <Input id="date" type="datetime-local" name="date" />
       </div>
       </CardContent>
     </Card>
@@ -147,8 +147,8 @@ export default function CreateInvoice() {
             </TableRow>
           </TableHeader>
           <TableBody>
-          {fields.map(field => (
-              <TableRow>
+          {fields.map((field, index) => (
+              <TableRow key={index}>
               <TableCell className="font-semibold">
                   <Input
                   id={`name_${field.id}`}

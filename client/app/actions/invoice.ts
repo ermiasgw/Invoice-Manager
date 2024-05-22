@@ -64,7 +64,7 @@ export async function createInvoice(state: any, formData: any) {
             name: formData.get(`name_${value}`),
             description: formData.get(`description_${value}`),
             type: formData.get(`type_${value}`),
-            price: formData.get(`price_${value}`),
+            price: Number(formData.get(`price_${value}`)),
         })
     })
 
@@ -80,7 +80,7 @@ export async function createInvoice(state: any, formData: any) {
          },
         body: JSON.stringify({
             currency: formData.get('currency'),
-            dueDate: formData.get('date'),
+            dueDate:  (new Date(formData.get('date'))).toISOString(),
             offerings: products
         })
       });

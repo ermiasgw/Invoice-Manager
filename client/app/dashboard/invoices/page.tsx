@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -78,10 +79,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import useSWR from 'swr' 
 
 
 export default function InvoiceList() {
-  
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  const { data, error } = useSWR('/api/invoice', fetcher)
+
+  if (error) {
+    return (<p>no data</p>)
+  }
   
   return (
   <main className="grid p-10">
@@ -171,9 +178,10 @@ export default function InvoiceList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow className="bg-accent">
+                  {data && data.map((value: any, index: any) => {
+                    <TableRow key={index} className="bg-accent">
                     <TableCell>
-                      1
+                      {value.id}
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">Liam Johnson</div>
@@ -187,9 +195,9 @@ export default function InvoiceList() {
                       </Badge>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      2023-06-23
+                      {value.dueDate}
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">$250.00</TableCell>
+                    <TableCell className="hidden md:table-cell">{value.price + " " + value.currency}</TableCell>
                     <TableCell className="hidden md:table-cell">
                       <Edit className="text-primary"/>
                     </TableCell>
@@ -197,6 +205,8 @@ export default function InvoiceList() {
                     <Trash className="text-destructive"/>
                     </TableCell>
                   </TableRow>
+                  })}
+                  
                   
                 </TableBody>
               </Table>

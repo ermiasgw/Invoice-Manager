@@ -42,7 +42,7 @@ export const createInvoiceFormSchema = z.object({
     .trim(),
   status: z.string().trim(),
   currency: z.string().trim(),
-  date: z.string()  
+  date: z.string() 
     
 })
 
