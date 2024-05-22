@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { Prisma, Role } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Public } from 'src/auth/auth.decorator';
+import { Public } from '../auth/auth.decorator';
 import { Roles } from './roles.decorator';
 
 @Controller('users')

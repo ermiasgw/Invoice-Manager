@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Res, ResponseDecoratorOptions } from '@nestjs/common';
 import { Invoice, Offering } from '@prisma/client';
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from '../database/database.service';
 import * as PDFDocument from 'pdfkit';
 import * as JSZip from 'jszip';
 import * as ExcelJS from 'exceljs';
